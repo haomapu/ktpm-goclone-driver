@@ -5,13 +5,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainActivity extends AppCompatActivity {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+public class MainActivity extends AppCompatActivity implements WebsocketConnector.BookingNotificationListener {
 
     BottomNavigationView navigationView;
     HomeFragment homeFragment;
@@ -21,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        WebsocketConnector websocketConnector = WebsocketConnector.getInstance();
+        websocketConnector.setBookingNotificationListener(this);
 
         navigationView = findViewById(R.id.bottom_navigation);
         if (homeFragment == null){
@@ -71,11 +84,45 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState); // Call super to propagate the instance state to child fragments (including HomeFragment)
-        // Save the instance state data for the MainActivity...
-        Log.e("Hello", "Haomapu12");
+    public void onBookingNotificationReceived(JSONObject bookingData) {
+        try {
+            showBottomSheet(bookingData);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showBottomSheet(JSONObject bookingData) throws JSONException {
+        Log.e("Hello", bookingData.toString());
+
+        String customerName = bookingData.getString("senderID");
+        String sourceLat = bookingData.getString("latitude");
+        String sourceLng = bookingData.getString("longitude");
+        String desLat = bookingData.getString("desLat");
+        String desLng = bookingData.getString("desLng");
+        String price = bookingData.getString("message");
+        Log.e("Hello", "Hello map u");
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        String sourceAddress = "", desAddress = "";
+        try {
+            List<Address> addresses = geocoder.getFromLocation(Double.valueOf(sourceLat), Double.valueOf(sourceLng), 1);
+            if (!addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                sourceAddress = address.getAddressLine(0);
+            }
+            addresses = geocoder.getFromLocation(Double.valueOf(desLat), Double.valueOf(desLng), 1);
+            if (!addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                desAddress = address.getAddressLine(0);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        RideRequestBottomSheet bottomSheet = new RideRequestBottomSheet(customerName, sourceAddress, desAddress, price);
+
+        bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
 
     }
 }

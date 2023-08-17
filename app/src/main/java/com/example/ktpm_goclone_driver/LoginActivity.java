@@ -34,7 +34,6 @@ public class LoginActivity extends AppCompatActivity {
     Button login;
     EditText username, password;
 
-    private String KEY_NUMBER = "NOMORHP";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

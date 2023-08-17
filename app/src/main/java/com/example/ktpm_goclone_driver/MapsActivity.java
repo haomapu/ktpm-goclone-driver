@@ -194,7 +194,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 throw new RuntimeException(e);
             }
 
-            apiCaller.post("/api/user/booking", jsonObject.toString(), new Callback() {
+            apiCaller.post("/api/driver/booking", jsonObject.toString(), new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     Log.e("Hello", e.toString());

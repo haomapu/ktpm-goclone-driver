@@ -20,34 +20,43 @@ public class WebsocketConnector {
     private boolean isWaitingForResponse = false;
     public boolean driver = false;
     private Handler responseHandler; // For handling response timeout
+    private BookingNotificationListener bookingNotificationListener;
+    public interface BookingNotificationListener {
+        void onBookingNotificationReceived(JSONObject bookingData);
+    }
 
 
     private WebsocketConnector(){
-        stompedClient = new StompedClient.StompedClientBuilder().build("ws://192.168.11.182:8080/ws");
-
+        stompedClient = new StompedClient.StompedClientBuilder().build("ws://192.168.1.180:8080/ws");
         stompedClient.subscribe("/topic/user/" + currentUser.getId() + "/chat", new StompedListener(){
             @Override
             public void onNotify(final StompedFrame frame){
                 Log.e("Hello", frame.getStompedBody().toString());
             }
         });
-
-        stompedClient.subscribe("/topic/user/" + currentUser.getId() + "/booking", new StompedListener(){
+        Log.e("Hello/ID", currentUser.getId());
+        stompedClient.subscribe("/topic/driver/" + currentUser.getId() + "/booking", new StompedListener() {
             @Override
-            public void onNotify(final StompedFrame frame){
+            public void onNotify(final StompedFrame frame) {
                 JSONObject jsonObject = null;
                 try {
-                    WebsocketConnector websocketConnector = WebsocketConnector.getInstance();
+
                     jsonObject = new JSONObject(frame.getStompedBody().toString());
+                    Log.e("Hello/Location", jsonObject.toString());
                     websocketConnector.setLatitude(jsonObject.getDouble("latitude"));
                     websocketConnector.setLongitude(jsonObject.getDouble("longitude"));
                     driver = true;
                     MapsActivity.checkStatus = false;
+
+                    // Notify the listener when a booking notification is received
+                    websocketConnector.notifyBookingNotification(jsonObject);
+
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
             }
         });
+
         stompedClient.subscribe("/topic/user/" + currentUser.getId() + "/pickup", new StompedListener(){
             @Override
             public void onNotify(final StompedFrame frame){
@@ -56,6 +65,19 @@ public class WebsocketConnector {
             }
         });
     }
+
+    // ...
+
+    public void setBookingNotificationListener(BookingNotificationListener listener) {
+        this.bookingNotificationListener = listener;
+    }
+
+    public void notifyBookingNotification(JSONObject bookingData) {
+        if (bookingNotificationListener != null) {
+            bookingNotificationListener.onBookingNotificationReceived(bookingData);
+        }
+    }
+
 
     public static WebsocketConnector getInstance() {
         if (websocketConnector == null) {
