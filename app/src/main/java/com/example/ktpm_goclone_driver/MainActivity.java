@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -123,6 +124,19 @@ public class MainActivity extends AppCompatActivity implements WebsocketConnecto
         RideRequestBottomSheet bottomSheet = new RideRequestBottomSheet(customerName, sourceAddress, desAddress, price);
 
         bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
+        String finalSourceAddress = sourceAddress;
+        String finalDesAddress = desAddress;
+        bottomSheet.setCallback((message -> {
+            if (message == "accept") {
+                Intent intent = new Intent(this, RideAcceptanceActivity.class);
+                intent.putExtra("customerName", customerName);
+                intent.putExtra("sourceAddress", finalSourceAddress);
+                intent.putExtra("desAddress", finalDesAddress);
+                intent.putExtra("price", price);
+
+                startActivity(intent);
+            }
+        }));
 
     }
 }

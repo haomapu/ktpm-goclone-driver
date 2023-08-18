@@ -14,8 +14,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
+
+import javax.security.auth.callback.Callback;
+
 public class RideRequestBottomSheet extends BottomSheetDialogFragment {
 
+    private Callback callback;
     private String customerName;
     private String sourceLocation;
     private String destinationLocation;
@@ -28,6 +33,9 @@ public class RideRequestBottomSheet extends BottomSheetDialogFragment {
         this.price = price;
     }
 
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -60,6 +68,8 @@ public class RideRequestBottomSheet extends BottomSheetDialogFragment {
                 String jsonMessage = gson.toJson(jsonObject);
                 WebsocketConnector websocketConnector = WebsocketConnector.getInstance();
                 websocketConnector.send("/app/accept", jsonMessage);
+
+                callback.onActionClick("accept");
                 dismiss();
             }
         });
@@ -68,10 +78,16 @@ public class RideRequestBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 // Handle deny button click
+                callback.onActionClick("deny");
                 dismiss();
             }
         });
 
         return view;
+    }
+    public interface Callback {
+
+        void onActionClick(String message);
+
     }
 }
