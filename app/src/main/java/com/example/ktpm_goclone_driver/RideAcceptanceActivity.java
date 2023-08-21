@@ -2,19 +2,75 @@ package com.example.ktpm_goclone_driver;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class RideAcceptanceActivity extends AppCompatActivity {
     TextView cusName, srcName, srcDes, destName, destDes, price;
     Button btn;
+    String name;
+    private Thread locationSendingThread;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+
+
+    private volatile boolean isLocationSending = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ride_acceptance);
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(1000); // Interval in milliseconds between updates
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        // Initialize locationCallback
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult != null) {
+                    Location location = locationResult.getLastLocation();
+                    if (location != null) {
+                        double currentLatitude = location.getLatitude();
+                        double currentLongitude = location.getLongitude();
+
+                        // Send the location data to the WebSocket server
+                        String locationData = createLocationDataJson(currentLatitude, currentLongitude);
+                        WebsocketConnector.getInstance().send("/topic/user/location", locationData);
+                    }
+                }
+            }
+        };
+
+        // Request location updates
+        try {
+            LocationServices.getFusedLocationProviderClient(this)
+                    .requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+        } catch (SecurityException e) {
+            // Handle permission denial
+        }
 
         cusName = findViewById(R.id.cusName);
         srcName = findViewById(R.id.srcName);
@@ -26,23 +82,66 @@ public class RideAcceptanceActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        if (intent != null) {
-            String customerName = intent.getStringExtra("customerName");
-            String sourceAddress = intent.getStringExtra("sourceAddress");
-            String desAddress = intent.getStringExtra("desAddress");
-            String priceIntent = intent.getStringExtra("price");
-
-            cusName.setText(customerName);
-            srcName.setText(sourceAddress);
-            destName.setText(desAddress);
-            price.setText(priceIntent);
-
-        }
+        String id = intent.getStringExtra("customerName");
+        String sourceAddress = intent.getStringExtra("sourceAddress");
+        String desAddress = intent.getStringExtra("desAddress");
+        String priceIntent = intent.getStringExtra("price");
+        getUserStatus(id);
+        srcName.setText(sourceAddress);
+        destName.setText(desAddress);
+        price.setText(priceIntent);
 
         btn.setOnClickListener(view -> {
+
             Intent i = new Intent(this, RideFinishActivity.class);
+            intent.putExtra("customerName", name);
+            intent.putExtra("sourceAddress", sourceAddress);
+            intent.putExtra("desAddress", desAddress);
+            intent.putExtra("price", priceIntent);
+
             startActivity(i);
             finish();
         });
+    }
+    private String createLocationDataJson(double latitude, double longitude) {
+        JSONObject locationJson = new JSONObject();
+        try {
+            locationJson.put("latitude", latitude);
+            locationJson.put("longitude", longitude);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return locationJson.toString();
+    }
+
+    public void getUserStatus(String id){
+        ApiCaller apiCaller = ApiCaller.getInstance();
+        String token = getApplicationContext().getSharedPreferences("MyToken", Context.MODE_PRIVATE).getString("token", null);
+        apiCaller.get("/api/driver/user/" + id, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    JSONObject jsonObject = new JSONObject(response.body().string());
+
+                    // Update UI elements using runOnUiThread
+                    runOnUiThread(() -> {
+                        try {
+                            cusName.setText(jsonObject.getString("username"));
+                            name = jsonObject.getString("username");
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, token);
     }
 }

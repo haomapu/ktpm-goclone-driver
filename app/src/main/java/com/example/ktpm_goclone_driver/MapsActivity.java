@@ -156,18 +156,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 long delayMillis = 10000;
 
                 if (!(websocketConnector.getLatitude() == 0.0 && websocketConnector.getLongitude() == 0.0)) {
-                    LatLng latLng = new LatLng(websocketConnector.getLatitude(), websocketConnector.getLongitude());
-                    String sourcePlace = String.valueOf(sourceAutoCompleteTextView.getText());
-                    LatLng sourceLatLng = getLocationFromAddress(sourcePlace);
-                    BitmapDescriptor driverIcon = BitmapDescriptorFactory.fromResource(R.drawable.driver);
-                    mMap.clear();
+//                    LatLng latLng = new LatLng(websocketConnector.getLatitude(), websocketConnector.getLongitude());
+//                    String sourcePlace = String.valueOf(sourceAutoCompleteTextView.getText());
+//                    LatLng sourceLatLng = getLocationFromAddress(sourcePlace);
+//                    BitmapDescriptor driverIcon = BitmapDescriptorFactory.fromResource(R.drawable.driver);
+//                    mMap.clear();
                     if (websocketConnector.driver){
-                        mMap.addMarker(new MarkerOptions().position(latLng).title("Driver").icon(driverIcon));
-                        mMap.addMarker(new MarkerOptions().position(sourceLatLng).title("Your Location")).showInfoWindow();
-                        fetchDirections(latLng, sourceLatLng);
+//                        mMap.addMarker(new MarkerOptions().position(latLng).title("Driver").icon(driverIcon));
+//                        mMap.addMarker(new MarkerOptions().position(sourceLatLng).title("Your Location")).showInfoWindow();
+//                        fetchDirections(latLng, sourceLatLng);
                     } else {
                         setCurrentLocationToSource();
-                        drawDirections(currentLatLng, desLatLng, "None");
+//                        drawDirections(currentLatLng, desLatLng, "None");
                     }
 
                 }
@@ -197,7 +197,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             apiCaller.post("/api/driver/booking", jsonObject.toString(), new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    Log.e("Hello", e.toString());
                 }
 
                 @Override
@@ -237,7 +236,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     }
                                 }
 
-                                hideSpinnerPopup();
+//                                hideSpinnerPopup();
 
                             }
                         }).start();
