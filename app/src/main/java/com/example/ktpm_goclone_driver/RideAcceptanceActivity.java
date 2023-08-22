@@ -35,7 +35,7 @@ public class RideAcceptanceActivity extends AppCompatActivity {
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
 
-
+    String id;
     private volatile boolean isLocationSending = true;
 
     @Override
@@ -43,22 +43,37 @@ public class RideAcceptanceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ride_acceptance);
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(1000); // Interval in milliseconds between updates
+        locationRequest.setInterval(4000); // Interval in milliseconds between updates
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
+        Intent intent = getIntent();
+        id = intent.getStringExtra("customerName");
+        String sourceAddress = intent.getStringExtra("sourceAddress");
+        String desAddress = intent.getStringExtra("desAddress");
+        String priceIntent = intent.getStringExtra("price");
         // Initialize locationCallback
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult != null) {
+                    JSONObject body = new JSONObject();
+
                     Location location = locationResult.getLastLocation();
                     if (location != null) {
-                        double currentLatitude = location.getLatitude();
-                        double currentLongitude = location.getLongitude();
+                        try {
+                            body.put("senderID", User.currentUser.getId());
+                            body.put("receiverID", id);
+                            double currentLatitude = location.getLatitude();
+                            double currentLongitude = location.getLongitude();
+                            body.put("latitude", currentLatitude);
+                            body.put("longitude", currentLongitude);
+                            String data = body.toString();
+                            Log.e("Hello/Location", data);
+                            WebsocketConnector websocketConnector = WebsocketConnector.getInstance();
+                            websocketConnector.send("/app/sendLocationBooking", data);
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
 
-                        // Send the location data to the WebSocket server
-                        String locationData = createLocationDataJson(currentLatitude, currentLongitude);
-                        WebsocketConnector.getInstance().send("/topic/user/location", locationData);
                     }
                 }
             }
@@ -81,11 +96,7 @@ public class RideAcceptanceActivity extends AppCompatActivity {
         btn = findViewById(R.id.button);
 
 
-        Intent intent = getIntent();
-        String id = intent.getStringExtra("customerName");
-        String sourceAddress = intent.getStringExtra("sourceAddress");
-        String desAddress = intent.getStringExtra("desAddress");
-        String priceIntent = intent.getStringExtra("price");
+
         getUserStatus(id);
         srcName.setText(sourceAddress);
         destName.setText(desAddress);

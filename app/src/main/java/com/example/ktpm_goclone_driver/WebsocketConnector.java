@@ -34,7 +34,7 @@ public class WebsocketConnector {
                 Log.e("Hello", frame.getStompedBody().toString());
             }
         });
-        Log.e("Hello/ID", currentUser.getId());
+
         stompedClient.subscribe("/topic/driver/" + currentUser.getId() + "/booking", new StompedListener() {
             @Override
             public void onNotify(final StompedFrame frame) {
