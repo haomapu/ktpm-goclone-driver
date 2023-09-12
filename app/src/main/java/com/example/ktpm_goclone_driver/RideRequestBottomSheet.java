@@ -62,8 +62,6 @@ public class RideRequestBottomSheet extends BottomSheetDialogFragment {
                 Gson gson = new Gson();
                 jsonObject.addProperty("senderID", currentUser.getId());
                 jsonObject.addProperty("receiverID", tvCustomerName.getText().toString());
-                jsonObject.addProperty("latitude", "10.794142037110948");
-                jsonObject.addProperty("longitude", "106.69327113648772");
                 jsonObject.addProperty("message", "pickup");
                 String jsonMessage = gson.toJson(jsonObject);
                 WebsocketConnector websocketConnector = WebsocketConnector.getInstance();

@@ -92,15 +92,12 @@ public class MainActivity extends AppCompatActivity implements WebsocketConnecto
     }
 
     private void showBottomSheet(JSONObject bookingData) throws JSONException {
-        Log.e("Hello", bookingData.toString());
-
         String customerName = bookingData.getString("senderID");
         String sourceLat = bookingData.getString("latitude");
         String sourceLng = bookingData.getString("longitude");
         String desLat = bookingData.getString("desLat");
         String desLng = bookingData.getString("desLng");
         String price = bookingData.getString("message");
-        Log.e("Hello", "Hello map u");
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         String sourceAddress = "", desAddress = "";
         try {

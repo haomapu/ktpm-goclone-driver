@@ -1,5 +1,7 @@
 package com.example.ktpm_goclone_driver;
 
+import static com.example.ktpm_goclone_driver.User.currentUser;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -9,11 +11,14 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -34,6 +39,7 @@ public class RideAcceptanceActivity extends AppCompatActivity {
     private Thread locationSendingThread;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
+    public String customerId;
 
     String id;
     private volatile boolean isLocationSending = true;
@@ -67,7 +73,6 @@ public class RideAcceptanceActivity extends AppCompatActivity {
                             body.put("latitude", currentLatitude);
                             body.put("longitude", currentLongitude);
                             String data = body.toString();
-                            Log.e("Hello/Location", data);
                             WebsocketConnector websocketConnector = WebsocketConnector.getInstance();
                             websocketConnector.send("/app/sendLocationBooking", data);
                         } catch (JSONException e) {
@@ -103,13 +108,22 @@ public class RideAcceptanceActivity extends AppCompatActivity {
         price.setText(priceIntent);
 
         btn.setOnClickListener(view -> {
+            LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
 
             Intent i = new Intent(this, RideFinishActivity.class);
-            intent.putExtra("customerName", name);
-            intent.putExtra("sourceAddress", sourceAddress);
-            intent.putExtra("desAddress", desAddress);
-            intent.putExtra("price", priceIntent);
+            i.putExtra("customerName", id);
+            i.putExtra("sourceAddress", sourceAddress);
+            i.putExtra("desAddress", desAddress);
+            i.putExtra("price", priceIntent);
 
+            JsonObject jsonObject = new JsonObject();
+            Gson gson = new Gson();
+            jsonObject.addProperty("senderID", currentUser.getId());
+            jsonObject.addProperty("receiverID", id);
+            jsonObject.addProperty("message", "pickup");
+            String jsonMessage = gson.toJson(jsonObject);
+            WebsocketConnector websocketConnector = WebsocketConnector.getInstance();
+            websocketConnector.send("/app/accept", jsonMessage);
             startActivity(i);
             finish();
         });
