@@ -120,7 +120,7 @@ public class RideAcceptanceActivity extends AppCompatActivity {
             Gson gson = new Gson();
             jsonObject.addProperty("senderID", currentUser.getId());
             jsonObject.addProperty("receiverID", id);
-            jsonObject.addProperty("message", "pickup");
+            jsonObject.addProperty("message", "done");
             String jsonMessage = gson.toJson(jsonObject);
             WebsocketConnector websocketConnector = WebsocketConnector.getInstance();
             websocketConnector.send("/app/accept", jsonMessage);
