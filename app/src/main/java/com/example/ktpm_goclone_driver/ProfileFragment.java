@@ -29,7 +29,7 @@ public class ProfileFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private LinearLayout logoutButton;
+    private LinearLayout logoutButton, dashboardButton;
 
 
     public ProfileFragment() {
@@ -73,11 +73,18 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         logoutButton = view.findViewById(R.id.logoutButton);
-
+        dashboardButton = view.findViewById(R.id.dashboardButton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 logout(); // Call the logout method
+            }
+        });
+        dashboardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(requireContext(), StatisticsActivity.class);
+                startActivity(myIntent);
             }
         });
     }

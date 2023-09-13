@@ -125,7 +125,7 @@ public class HistoryFragment extends Fragment implements ItemListener {
                         Date date = inputFormat.parse(jsonObject.getString("dateTime"));
                         String formattedDate = outputFormat.format(date);
                         Log.e("Hello", jsonObject.toString());
-                        locations.add(new ListHistoryLocation("From: " + getLocationAndConvertToAddress(jsonObject.getJSONObject("destinationLocation").getDouble("latitude"),jsonObject.getJSONObject("destinationLocation").getDouble("longitude")),"To: " + getLocationAndConvertToAddress(jsonObject.getJSONObject("sourceLocation").getDouble("latitude"),jsonObject.getJSONObject("sourceLocation").getDouble("longitude")), formattedDate, jsonObject.getString("price")));
+                        locations.add(new ListHistoryLocation("To: " + getLocationAndConvertToAddress(jsonObject.getJSONObject("destinationLocation").getDouble("latitude"),jsonObject.getJSONObject("destinationLocation").getDouble("longitude")),"From: " + getLocationAndConvertToAddress(jsonObject.getJSONObject("sourceLocation").getDouble("latitude"),jsonObject.getJSONObject("sourceLocation").getDouble("longitude")), formattedDate, jsonObject.getString("price")));
                         Log.e("Hello haompau", String.valueOf(locations.get(0).dateTime));
                     }
                     adapter = new HistoryLocationAdapter(getContext(), locations,  HistoryFragment.this);

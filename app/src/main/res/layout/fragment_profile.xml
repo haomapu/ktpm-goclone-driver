@@ -106,6 +106,7 @@
                         android:orientation="horizontal">
 
                         <LinearLayout
+                            android:id="@+id/dashboardButton"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_margin="10dp"
@@ -136,7 +137,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8dp"
-                                android:text="Payment"
+                                android:text="Dashboard"
                                 android:textAlignment="center"
                                 android:textColor="#000000"
                                 android:textSize="13sp"
@@ -176,7 +177,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8dp"
-                                android:text="Settings"
+                                android:text="Logout"
                                 android:textAlignment="center"
                                 android:textColor="#000000"
                                 android:textSize="13sp"
