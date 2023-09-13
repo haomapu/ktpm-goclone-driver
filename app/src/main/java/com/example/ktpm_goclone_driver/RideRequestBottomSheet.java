@@ -2,7 +2,9 @@ package com.example.ktpm_goclone_driver;
 
 import static com.example.ktpm_goclone_driver.User.currentUser;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,27 +12,36 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.google.android.gms.common.api.Api;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.security.auth.callback.Callback;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class RideRequestBottomSheet extends BottomSheetDialogFragment {
 
+    private Context context;
     private Callback callback;
     private String customerName;
     private String sourceLocation;
     private String destinationLocation;
     private String price;
+    private String bookingId;
 
-    public RideRequestBottomSheet(String customerName, String sourceLocation, String destinationLocation, String price) {
+    public RideRequestBottomSheet(Context context, String customerName, String sourceLocation, String destinationLocation, String price, String bookingId) {
+        this.context = context;
         this.customerName = customerName;
         this.sourceLocation = sourceLocation;
         this.destinationLocation = destinationLocation;
         this.price = price;
+        this.bookingId = bookingId;
     }
 
     public void setCallback(Callback callback) {
@@ -52,7 +63,7 @@ public class RideRequestBottomSheet extends BottomSheetDialogFragment {
         tvSourceLocation.setText(sourceLocation);
         tvDestinationLocation.setText(destinationLocation);
         tvPrice.setText(price);
-
+        ApiCaller apiCaller = ApiCaller.getInstance();
         btnAccept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,6 +77,20 @@ public class RideRequestBottomSheet extends BottomSheetDialogFragment {
                 String jsonMessage = gson.toJson(jsonObject);
                 WebsocketConnector websocketConnector = WebsocketConnector.getInstance();
                 websocketConnector.send("/app/accept", jsonMessage);
+                ApiCaller apiCaller = ApiCaller.getInstance();
+                String token = context.getSharedPreferences("MyToken", Context.MODE_PRIVATE).getString("token", null);
+
+                apiCaller.patch("/api/driver/booking/" + bookingId, jsonMessage, new okhttp3.Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        Log.e("Hello", response.body().string());
+                    }
+                }, token);
 
                 callback.onActionClick("accept");
                 dismiss();

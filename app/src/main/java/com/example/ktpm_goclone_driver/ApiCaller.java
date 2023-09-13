@@ -52,5 +52,21 @@ public class ApiCaller {
         Call call = client.newCall(request);
         call.enqueue(callback);
     }
+
+    public void patch(String path, String req, Callback callback, String header) {
+        RequestBody body = RequestBody.create(JSON, req);
+
+        Request.Builder requestBuilder = new Request.Builder()
+                .url(BASE_URL + path)
+                .patch(body);
+
+        if (!header.equalsIgnoreCase("None")) {
+            requestBuilder.addHeader("Authorization", "Bearer " + header);
+        }
+
+        Request request = requestBuilder.build();
+        Call call = client.newCall(request);
+        call.enqueue(callback);
+    }
 }
 

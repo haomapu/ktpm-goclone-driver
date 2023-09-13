@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements WebsocketConnecto
         String desLat = bookingData.getString("desLat");
         String desLng = bookingData.getString("desLng");
         String price = bookingData.getString("message");
+        String bookingId = bookingData.getString("bookingId");
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         String sourceAddress = "", desAddress = "";
         try {
@@ -114,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements WebsocketConnecto
         } catch (IOException e) {
             e.printStackTrace();
         }
-        RideRequestBottomSheet bottomSheet = new RideRequestBottomSheet(customerName, sourceAddress, desAddress, price);
+        RideRequestBottomSheet bottomSheet = new RideRequestBottomSheet(this,customerName, sourceAddress, desAddress, price, bookingId);
 
         bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
         String finalSourceAddress = sourceAddress;
