@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ public class RideFinishActivity extends AppCompatActivity {
     Button button;
     String id, sourceAddress, desAddress, priceIntent;
     TextView destName, price;
+    String parts[];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +32,14 @@ public class RideFinishActivity extends AppCompatActivity {
         desAddress = intent.getStringExtra("desAddress");
         priceIntent = intent.getStringExtra("price");
         destName.setText(desAddress);
-        price.setText(priceIntent);
+
+        if (priceIntent.contains("__")){
+            parts = priceIntent.split("__");
+            price.setText(parts[2]);
+        } else {
+            parts = null;
+            price.setText(priceIntent);
+        }
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

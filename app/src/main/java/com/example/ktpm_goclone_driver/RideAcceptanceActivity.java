@@ -45,6 +45,7 @@ public class RideAcceptanceActivity extends AppCompatActivity {
     ImageView imageView4;
 
     String phoneNumber;
+    String parts[];
 
     String id;
     private volatile boolean isLocationSending = true;
@@ -119,13 +120,22 @@ public class RideAcceptanceActivity extends AppCompatActivity {
         price = findViewById(R.id.price);
         btn = findViewById(R.id.button);
         cusPhone = findViewById(R.id.cusPhone);
-
-
         getUserStatus(id);
+
+        if (priceIntent.contains("__")){
+            parts = priceIntent.split("__");
+            Log.e("Hello", parts.toString());
+            cusName.setText(parts[0]);
+            price.setText(parts[2]);
+            cusPhone.setText(parts[1]);
+        } else {
+            parts = null;
+            price.setText(priceIntent);
+            cusPhone.setText(phoneNumber);
+        }
         srcName.setText(sourceAddress);
         destName.setText(desAddress);
-        price.setText(priceIntent);
-        cusPhone.setText(phoneNumber);
+
 
         btn.setOnClickListener(view -> {
             LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
@@ -147,6 +157,7 @@ public class RideAcceptanceActivity extends AppCompatActivity {
             startActivity(i);
             finish();
         });
+
     }
     private String createLocationDataJson(double latitude, double longitude) {
         JSONObject locationJson = new JSONObject();
@@ -179,6 +190,7 @@ public class RideAcceptanceActivity extends AppCompatActivity {
                             cusName.setText(jsonObject.getString("username"));
                             name = jsonObject.getString("username");
                             phoneNumber = jsonObject.getString("phoneNumber");
+                            cusPhone.setText(phoneNumber);
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }

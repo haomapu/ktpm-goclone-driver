@@ -26,7 +26,9 @@ public class MainActivity extends AppCompatActivity implements WebsocketConnecto
     BottomNavigationView navigationView;
     HomeFragment homeFragment;
     HistoryFragment historyFragment;
-
+    static String phoneNumber;
+    static String name;
+    static String priceWeb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,7 +129,12 @@ public class MainActivity extends AppCompatActivity implements WebsocketConnecto
                 intent.putExtra("sourceAddress", finalSourceAddress);
                 intent.putExtra("desAddress", finalDesAddress);
                 intent.putExtra("price", price);
-
+                if (phoneNumber != null){
+                    intent.putExtra("phoneNumber", phoneNumber);
+                    intent.putExtra("name", name);
+                    intent.putExtra("priceWeb", priceWeb);
+                } else {
+                }
                 startActivity(intent);
             }
         }));
