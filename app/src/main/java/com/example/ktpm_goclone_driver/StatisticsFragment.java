@@ -69,6 +69,11 @@ public class StatisticsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         txt_total_revenue = view.findViewById(R.id.txt_total_revenue);
         txt_inventory = view.findViewById(R.id.txt_inventory);
+
+        ArrayList<Integer> totalpriceList = new ArrayList<>();
+//        ArrayList<Integer> nowpriceList = new ArrayList<>();
+//        ArrayList<Integer> pastpriceList = new ArrayList<>();
+
         ApiCaller apiCaller = ApiCaller.getInstance();
         String token = getContext().getSharedPreferences("MyToken", Context.MODE_PRIVATE).getString("token", null);
 
@@ -96,6 +101,7 @@ public class StatisticsFragment extends Fragment {
                         Log.e("price", jsonObject.getString("price"));
 
                         if (status.equals("0")) {
+                            totalpriceList.add(Integer.valueOf(jsonObject.getString("price")));
                             totalPrice += Integer.valueOf(jsonObject.getString("price"));
                             countBooking += 1;
 
@@ -105,6 +111,7 @@ public class StatisticsFragment extends Fragment {
                             String formattedCurrentdate = localDateTime.format(myFormatObj);
 
                             if (formattedDate.equals(formattedCurrentdate)) {
+                                totalpriceList.add(Integer.valueOf(jsonObject.getString("price")));
                                 totalPrice += Integer.valueOf(jsonObject.getString("price"));
                                 countBooking += 1;
                             }
@@ -114,6 +121,7 @@ public class StatisticsFragment extends Fragment {
                             String formattedPreviousdate = localDateTime.format(myFormatObj);
 
                             if (formattedDate.equals(formattedPreviousdate)) {
+                                totalpriceList.add(Integer.valueOf(jsonObject.getString("price")));
                                 totalPrice += Integer.valueOf(jsonObject.getString("price"));
                                 countBooking += 1;
                             }
@@ -134,7 +142,10 @@ public class StatisticsFragment extends Fragment {
 
                             List<BarEntry> barEntries = new ArrayList<>();
                             Log.e("totalPrice", String.valueOf(totalPrice));
-                            barEntries.add(new BarEntry(1f, totalPrice));
+                            for (int i = 1; i <= countBooking; i++) {
+                                barEntries.add(new BarEntry(i, totalpriceList.get(i)));
+                            }
+
 
                             BarDataSet barDataSet = new BarDataSet(barEntries, "Bar Data Set");
                             barDataSet.setColors(Color.parseColor("#ffb259"));
@@ -144,6 +155,7 @@ public class StatisticsFragment extends Fragment {
                             barChart.setData(barData);
 
                             barChart.setDrawValueAboveBar(true);
+
                             barChart.getDescription().setEnabled(false);
                             barChart.getLegend().setEnabled(false);
                             barChart.getAxisRight().setEnabled(false);
