@@ -142,8 +142,8 @@ public class StatisticsFragment extends Fragment {
 
                             List<BarEntry> barEntries = new ArrayList<>();
                             Log.e("totalPrice", String.valueOf(totalPrice));
-                            for (int i = 1; i <= countBooking; i++) {
-                                barEntries.add(new BarEntry(i, totalpriceList.get(i)));
+                            for (int i = 0; i < countBooking; i++) {
+                                barEntries.add(new BarEntry(i + 1, totalpriceList.get(i)));
                             }
 
 
