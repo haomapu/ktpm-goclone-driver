@@ -181,18 +181,6 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
-                        android:id="@+id/destDes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="none"
-                        android:singleLine="false"
-                        android:text="50 Đồng Đen, Phường 14, Quận Tân Bình, Hồ Chí Minh, Vietnam"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/destName" />
-
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -217,33 +205,6 @@
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="none"
-                    android:singleLine="false"
-                    android:layout_weight="1"
-                    android:text="Tài khoản"
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="none"
-                    android:singleLine="false"
-                    android:text="-đ 7.200"
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
-
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

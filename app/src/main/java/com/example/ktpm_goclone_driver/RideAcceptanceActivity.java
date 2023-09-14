@@ -15,11 +15,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -33,13 +35,16 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class RideAcceptanceActivity extends AppCompatActivity {
-    TextView cusName, srcName, srcDes, destName, destDes, price;
+    TextView cusName, srcName, srcDes, destName, destDes, price, cusPhone;
     Button btn;
     String name;
     private Thread locationSendingThread;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
     public String customerId;
+    ImageView imageView4;
+
+    String phoneNumber;
 
     String id;
     private volatile boolean isLocationSending = true;
@@ -48,6 +53,20 @@ public class RideAcceptanceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ride_acceptance);
+        imageView4 = findViewById(R.id.imageView4);
+        imageView4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Getting instance of Intent with action as ACTION_CALL
+                Intent phone_intent = new Intent(Intent.ACTION_CALL);
+
+                // Set data of Intent through Uri by parsing phone number
+                phone_intent.setData(Uri.parse("tel:" + phoneNumber));
+
+                // start Intent
+                startActivity(phone_intent);
+            }
+        });
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(4000); // Interval in milliseconds between updates
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -99,13 +118,14 @@ public class RideAcceptanceActivity extends AppCompatActivity {
         destDes = findViewById(R.id.destDes);
         price = findViewById(R.id.price);
         btn = findViewById(R.id.button);
-
+        cusPhone = findViewById(R.id.cusPhone);
 
 
         getUserStatus(id);
         srcName.setText(sourceAddress);
         destName.setText(desAddress);
         price.setText(priceIntent);
+        cusPhone.setText(phoneNumber);
 
         btn.setOnClickListener(view -> {
             LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
@@ -158,6 +178,7 @@ public class RideAcceptanceActivity extends AppCompatActivity {
                         try {
                             cusName.setText(jsonObject.getString("username"));
                             name = jsonObject.getString("username");
+                            phoneNumber = jsonObject.getString("phoneNumber");
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
